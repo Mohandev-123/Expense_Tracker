@@ -1,0 +1,54 @@
+from django.http import JsonResponse
+from django.views.decorators.csrf import csrf_exempt
+import json
+from .models import *
+from rest_framework import status
+
+# Create your views here.
+#Signup API
+@csrf_exempt
+def signup(request):
+    if request.method == 'POST':
+        data = json.loads(request.body)
+        fullname = data.get('FullName')
+        email = data.get('Email')
+        password = data.get('Password')
+
+        if UserDetail.objects.filter(Email=email).exists():
+            return JsonResponse({'message':'Email already exits'},status=400)
+        UserDetail.objects.create(FullName=fullname, Email=email, Password=password)
+        return JsonResponse({'message':'User Registered Sucessfully'},status=201)
+
+#Login API
+@csrf_exempt
+def login(request):
+    if request.method == 'POST':
+        data = json.loads(request.body)
+        email = data.get('Email')
+        password = data.get('Password')
+
+        try:
+            user = UserDetail.objects.get(Email=email, Password=password)
+            return JsonResponse({'message':'Login Sucessfully','userId':user.id,
+            'userName':user.FullName
+            },status=200)
+        except:
+            return JsonResponse({'message':'Invalid Credentials'},status=400)
+
+#add expense
+@csrf_exempt
+def add_expense(request):
+    if request.method == 'POST':
+        data = json.loads(request.body)
+        user_id = data.get('UserId')
+        expense_date = data.get('ExpenseDate')
+        expense_item = data.get('ExpenseItem')
+        expense_cost = data.get('ExpenseCost')
+
+        user = UserDetail.objects.get(id = user_id)
+        try:
+            Expense.objects.create(UserId=user,ExpenseDate=expense_date,ExpenseItem=expense_item,ExpenseCost=expense_cost,)
+            return JsonResponse({'message':'Expense added sucessfully'
+            },status=201)
+        except Exception as e:
+            return JsonResponse({'message':'Something went wrong','error':str(e)},status=400)
