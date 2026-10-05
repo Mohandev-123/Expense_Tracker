@@ -1,17 +1,28 @@
-import React, {useState, useEffect} from 'react'
-import {toast, ToastContainer} from 'react-toastify'
+import React, { useState, useEffect } from 'react'
+import { toast, ToastContainer } from 'react-toastify'
 import 'react-toastify/dist/ReactToastify.css'
-import {useNavigate} from 'react-router-dom'
+import { useNavigate } from 'react-router-dom'
 
 const ManageExpense = () => {
+  const navigate = useNavigate()
+  const [expenses, setExpenses] = useState([])
+  const userId = localStorage.getItem('userId')
+  useEffect(() => {
+    if (!userId) {
+      navigate('/login')
+    }
+    fetchExpenses(userId)
+  }, [])
 
-    const navigate = useNavigate()
-    const userId = localStorage.getItem('userId')
-          useEffect(()=>{
-            if(!userId) {
-              navigate('/login')
-            }
-          },[])
+  const fetchExpenses = async (userId) => {
+    try {
+      const response = await fetch(`http://127.0.0.1:8000/api/manage_expense/${userId}/`)
+      const data = await response.json()
+      setExpenses(data)
+    } catch (error) {
+      console.error("Error fetching expenses: ", error)
+    }
+  }
 
   return (
     <div className='container mt-5'>
@@ -21,36 +32,38 @@ const ManageExpense = () => {
       </div>
       <div>
         <table className='table table-striped table-bordered'>
-            <thead className='table-dark text-center'>
+          <thead className='table-dark text-center'>
+            <tr>
+              <th>#</th>
+              <th>Date</th>
+              <th>Item</th>
+              <th>Cost (₹)</th>
+              <th>Action</th>
+            </tr>
+          </thead>
+          <tbody>
+            {expenses.length > 0 ? (
+              expenses.map((exp, index) => (
                 <tr>
-                    <th>#</th>
-                    <th>Date</th>
-                    <th>Item</th>
-                    <th>Cost (₹)</th>
-                    <th>Action</th>
+                  <td>{index + 1}</td>
+                  <td>{exp.ExpenseDate}</td>
+                  <td>{exp.ExpenseItem}</td>
+                  <td>{exp.ExpenseCost}</td>
+                  <td>
+                    <button className='btn btn-sm btn-info me-2'><i className='fas fa-edit'></i></button>
+                    <button className='btn btn-sm btn-danger'><i className='fas fa-trash-alt'></i></button>
+                  </td>
                 </tr>
-            </thead>
-            <tbody>
-                <tr>
-                    <td>#</td>
-                    <td>12/12/2026</td>
-                    <td>books</td>
-                    <td>500</td>
-                    <td>Action</td>
-                </tr>
-                <tr>
-                    <td>#</td>
-                    <td>12/12/2026</td>
-                    <td>books</td>
-                    <td>500</td>
-                    <td>Action</td>
-                </tr>
-                <tr>
-                    <td colSpan="5" className='text-center text-muted'><i className='fas fa-exclamation-circle me-2'></i>No expenses found</td>
-                </tr>
-            </tbody>
+              ))
+            ) : (
+              <tr>
+                <td colSpan="5" className='text-center text-muted'><i className='fas fa-exclamation-circle me-2'></i>No expenses found</td>
+              </tr>
+            )}
+          </tbody>
         </table>
       </div>
+      <ToastContainer />
     </div>
   )
 }
