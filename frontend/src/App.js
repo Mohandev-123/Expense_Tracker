@@ -7,6 +7,7 @@ import Navbar from './components/Navbar';
 import Home from './components/Home';
 import Dashboard from './components/Dashboard';
 import AddExpense from './components/AddExpense';
+import ManageExpense from './components/ManageExpense';
 
 function App() {
   return (
@@ -19,6 +20,7 @@ function App() {
           <Route path='/login' element={<Login/>}></Route>
           <Route path='/dashboard' element={<Dashboard/>}></Route>
           <Route path='/add-expense' element={<AddExpense/>}></Route>
+          <Route path='/manage-expense' element={<ManageExpense/>}></Route>
         </Routes>
       </BrowserRouter>
     </div>

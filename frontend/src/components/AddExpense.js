@@ -54,7 +54,7 @@ const AddExpense = () => {
 
 
   return (
-    <div className='container mt-4'>
+    <div className='container mt-5'>
       <div className='text-center mb-4'>
         <h2><i className='fas fa-plus-circle me-2'></i>AddExpense</h2>
         <p className='text-muted'>Create your account to start tracting expenses</p>
